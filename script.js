@@ -5,6 +5,12 @@ function checkNotFollback() {
     const jsonFollowers = document.getElementById('followersInput').value;
     const jsonFollowing = document.getElementById('followingInput').value;
 
+    // Pengecekan apakah textarea kosong
+    if (!jsonFollowers.trim() || !jsonFollowing.trim()) {
+        swal("Error", "Both JSON fields must be filled out.", "error");
+        return;
+    }
+
     try {
         const followersData = JSON.parse(jsonFollowers);
         const followingData = JSON.parse(jsonFollowing).relationships_following;
@@ -58,7 +64,13 @@ function displayNotFollbackAccounts() {
     }
 
     // Tampilkan hasil "Not Follback"
-    let output = `<h2>Not Follback List: ${totalNotFollback}</h2>`;
+    let output = `<div class="d-flex justify-content-between align-items-center">`;
+    output += `<h2>Not Follback List: ${totalNotFollback}</h2>`;
+    if (totalNotFollback > 0) {
+        output += `<button id="copyButton" class="btn btn-secondary" onclick="copyNotFollbackAccounts()">Copy</button>`;
+    }
+    output += `</div>`;
+    
     if (totalNotFollback > 0) {
         notFollbackAccounts.forEach(account => {
             const date = new Date(account.timestamp * 1000); // Konversi timestamp ke milidetik
@@ -70,9 +82,19 @@ function displayNotFollbackAccounts() {
         });
     } else {
         output += `<p>Semua orang di following mem-follow balik.</p>`;
+        document.getElementById('copyButton').style.display = 'none'; // Sembunyikan tombol copy
     }
 
     document.getElementById('notFollbackOutput').innerHTML = output;
+}
+
+function copyNotFollbackAccounts() {
+    const accountNames = notFollbackAccounts.map(account => account.value).join('\n'); // Ambil semua nama akun
+    navigator.clipboard.writeText(accountNames).then(() => {
+        swal("Copied!", "Account names have been copied to clipboard.", "success"); // Notifikasi sukses
+    }).catch(err => {
+        swal("Error", "Failed to copy account names.", "error"); // Notifikasi gagal
+    });
 }
 
 // Event listeners untuk sort option dan sort order
