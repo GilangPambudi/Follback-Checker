@@ -1,50 +1,74 @@
 let notFollbackAccounts = []; // Variabel global untuk menyimpan akun not follback
 let totalNotFollback = 0; // Variabel untuk menyimpan total akun not follback
 
-function checkNotFollback() {
-    const jsonFollowers = document.getElementById('followersInput').value;
-    const jsonFollowing = document.getElementById('followingInput').value;
+document.querySelectorAll('.custom-file-input').forEach(input => {
+    input.addEventListener('change', function() {
+        const fileName = this.files[0] ? this.files[0].name : 'Choose file';
+        const nextSibling = this.nextElementSibling;
+        nextSibling.innerText = fileName;
+    });
+});
 
-    // Pengecekan apakah textarea kosong
-    if (!jsonFollowers.trim() || !jsonFollowing.trim()) {
-        swal("Error", "Both JSON fields must be filled out.", "error");
+
+function checkNotFollback() {
+    const followersFile = document.getElementById('followersFile').files[0];
+    const followingFile = document.getElementById('followingFile').files[0];
+
+    // Pengecekan apakah file diupload
+    if (!followersFile || !followingFile) {
+        swal("Error", "Both JSON files must be uploaded.", "error");
         return;
     }
 
-    try {
-        const followersData = JSON.parse(jsonFollowers);
-        const followingData = JSON.parse(jsonFollowing).relationships_following;
+    const reader1 = new FileReader();
+    const reader2 = new FileReader();
 
-        const followerNames = [];
+    reader1.onload = function(event) {
+        const jsonFollowers = event.target.result;
+        
+        reader2.onload = function(event) {
+            const jsonFollowing = event.target.result;
 
-        // Kumpulkan semua nama dari followers
-        followersData.forEach(item => {
-            item.string_list_data.forEach(account => {
-                followerNames.push(account.value);
-            });
-        });
+            try {
+                const followersData = JSON.parse(jsonFollowers);
+                const followingData = JSON.parse(jsonFollowing).relationships_following;
 
-        // Cek setiap following apakah ada di followers, jika tidak tambahkan ke daftar "Not Follback"
-        notFollbackAccounts = []; // Reset array notFollbackAccounts setiap kali fungsi dipanggil
-        followingData.forEach(item => {
-            item.string_list_data.forEach(account => {
-                if (!followerNames.includes(account.value)) {
-                    notFollbackAccounts.push(account); // Simpan akun yang tidak mem-follow balik
-                }
-            });
-        });
+                const followerNames = [];
 
-        totalNotFollback = notFollbackAccounts.length; // Simpan total not follback
-        displayNotFollbackAccounts(); // Panggil fungsi untuk menampilkan hasil
+                // Kumpulkan semua nama dari followers
+                followersData.forEach(item => {
+                    item.string_list_data.forEach(account => {
+                        followerNames.push(account.value);
+                    });
+                });
 
-        // Tampilkan dropdown sorting
-        document.getElementById('sorting').style.display = 'block';
-        document.getElementById('sortingOptions').style.display = 'block';
-        document.getElementById('sortOrderOptions').style.display = 'block';
+                // Cek setiap following apakah ada di followers, jika tidak tambahkan ke daftar "Not Follback"
+                notFollbackAccounts = []; // Reset array notFollbackAccounts setiap kali fungsi dipanggil
+                followingData.forEach(item => {
+                    item.string_list_data.forEach(account => {
+                        if (!followerNames.includes(account.value)) {
+                            notFollbackAccounts.push(account); // Simpan akun yang tidak mem-follow balik
+                        }
+                    });
+                });
 
-    } catch (error) {
-        swal("Error", "Invalid JSON data.", "error");
-    }
+                totalNotFollback = notFollbackAccounts.length; // Simpan total not follback
+                displayNotFollbackAccounts(); // Panggil fungsi untuk menampilkan hasil
+
+                // Tampilkan dropdown sorting
+                document.getElementById('sorting').style.display = 'block';
+                document.getElementById('sortingOptions').style.display = 'block';
+                document.getElementById('sortOrderOptions').style.display = 'block';
+
+            } catch (error) {
+                swal("Error", "Invalid JSON data.", "error");
+            }
+        };
+
+        reader2.readAsText(followingFile); // Membaca file following setelah followers selesai dibaca
+    };
+
+    reader1.readAsText(followersFile); // Membaca file followers
 }
 
 function displayNotFollbackAccounts() {
@@ -76,8 +100,8 @@ function displayNotFollbackAccounts() {
             const date = new Date(account.timestamp * 1000); // Konversi timestamp ke milidetik
             output += `<div class="card mb-3"><div class="card-body">`;
             output += `<h5 class="card-title">Account name: ${account.value}</h5>`;
-            output += `<p class="card-text">Link: <a href="${account.href}" target="_blank">${account.href}</a></p>`;
-            output += `<p class="card-text">Date: ${date.toLocaleString()}</p>`;
+            output += `<p class="card-text">Link to profile: <a href="${account.href}" target="_blank">${account.value}</a></p>`;
+            output += `<p class="card-text">Date following: ${date.toLocaleString()}</p>`;
             output += `</div></div>`;
         });
     } else {

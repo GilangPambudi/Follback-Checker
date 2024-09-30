@@ -5,21 +5,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Check Follow Back</title>
-    <link rel=icon href="https://i.postimg.cc/7ZVCp84K/json-file.png" title="json file icons">
+    <link rel=icon href="https://seeklogo.com/images/I/instagram-logo-A807AD378B-seeklogo.com.png"
+        title="json file icons">
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
 </head>
 
 <body style="background-color: #f5f5f5;">
     <div class="container mt-4">
         <h1 class="mb-4 text-center font-weight-bold">Check Follow Back</h1>
+
         <div class="form-group">
-            <textarea id="followersInput" class="form-control" rows="5"
-                placeholder='Masukkan data JSON Followers di sini'></textarea>
+            <label for="followersFile" class="font-weight-bold">Upload Followers JSON File</label>
+            <div class="custom-file">
+                <input type="file" id="followersFile" class="custom-file-input" accept=".json" required>
+                <label class="custom-file-label" for="followersFile">Choose file</label>
+            </div>
         </div>
         <div class="form-group">
-            <textarea id="followingInput" class="form-control" rows="5"
-                placeholder='Masukkan data JSON Following di sini'></textarea>
+            <label for="followingFile" class="font-weight-bold">Upload Following JSON File</label>
+            <div class="custom-file">
+                <input type="file" id="followingFile" class="custom-file-input" accept=".json" required>
+                <label class="custom-file-label" for="followingFile">Choose file</label>
+            </div>
         </div>
 
         <div class="d-flex justify-content-center mt-4">
@@ -29,14 +39,16 @@
         <div class="form-group mt-4" id="sorting" style="display: none;">
             <div class="row">
                 <div class="col-md-6">
-                    <label class="font-weight-bold" for="sortOption" id="sortingOptions" style="display: none;">Sort by:</label>
+                    <label class="font-weight-bold" for="sortOption" id="sortingOptions" style="display: none;">Sort
+                        by:</label>
                     <select id="sortOption" class="form-control">
                         <option value="accountName">Account Name</option>
                         <option value="date">Date</option>
                     </select>
                 </div>
                 <div class="col-md-6">
-                    <label class="font-weight-bold" for="sortOrder" id="sortOrderOptions" style="display: none;">Sort order:</label>
+                    <label class="font-weight-bold" for="sortOrder" id="sortOrderOptions" style="display: none;">Sort
+                        order:</label>
                     <select id="sortOrder" class="form-control">
                         <option value="asc">Ascending</option>
                         <option value="desc">Descending</option>
@@ -48,6 +60,8 @@
         <div id="notFollbackOutput" class="mt-4"></div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.js"></script>
+    <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
     <script src="script.js"></script>
 </body>
 
