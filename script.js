@@ -87,23 +87,39 @@ function displayNotFollbackAccounts() {
         notFollbackAccounts.reverse();
     }
 
-    // Tampilkan hasil "Not Follback"
-    let output = `<div class="d-flex justify-content-between align-items-center">`;
+    // Tampilkan hasil "Not Follback" dalam tabel
+    let output = `<div class="d-flex justify-content-between align-items-center mb-3">`;
     output += `<h2>Not Follback List: ${totalNotFollback}</h2>`;
     if (totalNotFollback > 0) {
         output += `<button id="copyButton" class="btn btn-secondary" onclick="copyNotFollbackAccounts()">Copy</button>`;
     }
     output += `</div>`;
-    
+
     if (totalNotFollback > 0) {
-        notFollbackAccounts.forEach(account => {
+        // Membuat tabel dengan header
+        output += `<table class="table table-striped table-bordered table-md table-hover rounded-lg">
+                        <thead>
+                            <tr>
+                                <th scope="col">No</th> <!-- Kolom nomor -->
+                                <th scope="col">Account Name</th>
+                                <th scope="col">Profile Link</th>
+                                <th scope="col">Date Following</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+        // Menambahkan data ke dalam tabel dengan nomor urut
+        notFollbackAccounts.forEach((account, index) => {
             const date = new Date(account.timestamp * 1000); // Konversi timestamp ke milidetik
-            output += `<div class="card mb-3"><div class="card-body">`;
-            output += `<h5 class="card-title">Account name: ${account.value}</h5>`;
-            output += `<p class="card-text">Link to profile: <a href="${account.href}" target="_blank">${account.value}</a></p>`;
-            output += `<p class="card-text">Date following: ${date.toLocaleString()}</p>`;
-            output += `</div></div>`;
+            output += `<tr>
+                            <td>${index + 1}</td> <!-- Menampilkan nomor urut -->
+                            <td>${account.value}</td>
+                            <td><a href="${account.href}" target="_blank">${account.value}</a></td>
+                            <td>${date.toLocaleString()}</td>
+                        </tr>`;
         });
+
+        output += `</tbody></table>`;
     } else {
         output += `<p>Semua orang di following mem-follow balik.</p>`;
         document.getElementById('copyButton').style.display = 'none'; // Sembunyikan tombol copy
@@ -111,6 +127,8 @@ function displayNotFollbackAccounts() {
 
     document.getElementById('notFollbackOutput').innerHTML = output;
 }
+
+
 
 function copyNotFollbackAccounts() {
     const accountNames = notFollbackAccounts.map(account => account.value).join('\n'); // Ambil semua nama akun
