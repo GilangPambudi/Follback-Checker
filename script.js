@@ -2,7 +2,7 @@ let notFollbackAccounts = []; // Variabel global untuk menyimpan akun not follba
 let totalNotFollback = 0; // Variabel untuk menyimpan total akun not follback
 
 document.querySelectorAll('.custom-file-input').forEach(input => {
-    input.addEventListener('change', function() {
+    input.addEventListener('change', function () {
         const fileName = this.files[0] ? this.files[0].name : 'Choose file';
         const nextSibling = this.nextElementSibling;
         nextSibling.innerText = fileName;
@@ -23,10 +23,10 @@ function checkNotFollback() {
     const reader1 = new FileReader();
     const reader2 = new FileReader();
 
-    reader1.onload = function(event) {
+    reader1.onload = function (event) {
         const jsonFollowers = event.target.result;
-        
-        reader2.onload = function(event) {
+
+        reader2.onload = function (event) {
             const jsonFollowing = event.target.result;
 
             try {
@@ -97,31 +97,32 @@ function displayNotFollbackAccounts() {
 
     if (totalNotFollback > 0) {
         // Membuat tabel dengan header
-        output += `<table class="table table-striped table-bordered table-md table-hover rounded-lg">
-                        <thead>
+        output += `<div class="table-responsive"> <table class="table table-bordered table-hover rounded-lg table-sm">
+                        <thead class="bg-primary text-white">
                             <tr>
-                                <th scope="col">No</th> <!-- Kolom nomor -->
+                                <th scope="col">No</th>
                                 <th scope="col">Account Name</th>
                                 <th scope="col">Profile Link</th>
-                                <th scope="col">Date Following</th>
+                                <th scope="col">Date Following</th> <!-- Hanya tampil di desktop -->
                             </tr>
                         </thead>
-                        <tbody>`;
-
-        // Menambahkan data ke dalam tabel dengan nomor urut
-        notFollbackAccounts.forEach((account, index) => {
-            const date = new Date(account.timestamp * 1000); // Konversi timestamp ke milidetik
-            output += `<tr>
-                            <td>${index + 1}</td> <!-- Menampilkan nomor urut -->
-                            <td>${account.value}</td>
-                            <td><a href="${account.href}" target="_blank">${account.value}</a></td>
-                            <td>${date.toLocaleString()}</td>
-                        </tr>`;
-        });
-
-        output += `</tbody></table>`;
+                        <tbody>
+                            ${notFollbackAccounts
+                                .map((account, index) => {
+                                    const date = new Date(account.timestamp * 1000).toLocaleString(); // Konversi timestamp
+                                    return `<tr>
+                                        <td>${index + 1}</td>
+                                        <td>${account.value}</td>
+                                        <td><a href="${account.href}" target="_blank">${account.value}</a></td>
+                                        <td>${date}</td> <!-- Hanya tampil di desktop -->
+                                    </tr>`;
+                                })
+                                .join("")}
+                        </tbody>
+                    </table></div>`;
+        //End of table
     } else {
-        output += `<p>Semua orang di following mem-follow balik.</p>`;
+        output += `<p>Everyone you are following follows you back.</p>`;
         document.getElementById('copyButton').style.display = 'none'; // Sembunyikan tombol copy
     }
 
