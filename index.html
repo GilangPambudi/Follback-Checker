@@ -5,63 +5,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Check Follow Back</title>
-    <link rel=icon href="https://seeklogo.com/images/I/instagram-logo-A807AD378B-seeklogo.com.png"
+    <link rel="icon" href="https://seeklogo.com/images/I/instagram-logo-A807AD378B-seeklogo.com.png"
         title="json file icons">
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
 </head>
 
 <body style="background-color: #f5f5f5;">
     <div class="container mt-4">
         <h1 class="mb-4 text-center font-weight-bold">Check Follow Back</h1>
 
-        <div class="form-group">
-            <label for="followersFile" class="font-weight-bold">Upload Followers JSON File</label>
-            <div class="custom-file">
-                <input type="file" id="followersFile" class="custom-file-input" accept=".json" required>
-                <label class="custom-file-label" for="followersFile">Choose file</label>
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="followingFile" class="font-weight-bold">Upload Following JSON File</label>
-            <div class="custom-file">
-                <input type="file" id="followingFile" class="custom-file-input" accept=".json" required>
-                <label class="custom-file-label" for="followingFile">Choose file</label>
-            </div>
-        </div>
-
-        <div class="d-flex justify-content-center mt-4">
-            <button class="btn btn-primary" onclick="checkNotFollback()">Submit</button>
-        </div>
-
-        <div class="form-group mt-4" id="sorting" style="display: none;">
-            <div class="row">
-                <div class="col-md-6">
-                    <label class="font-weight-bold" for="sortOption" id="sortingOptions" style="display: none;">Sort
-                        by:</label>
-                    <select id="sortOption" class="form-control">
-                        <option value="accountName">Account Name</option>
-                        <option value="date">Date</option>
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <label class="font-weight-bold" for="sortOrder" id="sortOrderOptions" style="display: none;">Sort
-                        order:</label>
-                    <select id="sortOrder" class="form-control">
-                        <option value="asc">Ascending</option>
-                        <option value="desc">Descending</option>
-                    </select>
+        <!-- Input Section -->
+        <div id="inputSection">
+            <div class="form-group">
+                <label for="zipFile" class="font-weight-bold">Upload ZIP File</label>
+                <div class="custom-file">
+                    <input type="file" id="zipFile" class="custom-file-input" accept=".zip">
+                    <label class="custom-file-label" for="zipFile">Choose file</label>
                 </div>
             </div>
+
+            <div class="d-flex justify-content-center mt-4">
+                <button class="btn btn-primary" onclick="checkNotFollback()">Submit</button>
+            </div>
         </div>
 
-        <div id="notFollbackOutput" class="mt-4"></div>
+        <!-- Output Section -->
+        <div id="outputSection" style="display: none;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2>Not Follback List: <span id="totalNotFollback">0</span></h2>
+                <div>
+                    <button id="copyButton" class="btn btn-secondary mr-2"
+                        onclick="copyNotFollbackAccounts()">Copy</button>
+                    <button id="newButton" class="btn btn-success" onclick="resetForm()">New</button>
+                </div>
+            </div>
+
+            <div class="card mb-4 bg-light">
+                <div class="card-body">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="font-weight-bold" for="sortOption">Sort by:</label>
+                                <select id="sortOption" class="form-control" onchange="displayNotFollbackAccounts()">
+                                    <option value="accountName">Account Name</option>
+                                    <option value="date">Date</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="font-weight-bold" for="sortOrder">Sort order:</label>
+                                <select id="sortOrder" class="form-control" onchange="displayNotFollbackAccounts()">
+                                    <option value="asc">Ascending</option>
+                                    <option value="desc">Descending</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="notFollbackOutput" class="mt-4"></div>
+        </div>
     </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.js"></script>
-    <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
     <script src="script.js"></script>
 </body>
 

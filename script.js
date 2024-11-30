@@ -1,6 +1,7 @@
 let notFollbackAccounts = []; // Variabel global untuk menyimpan akun not follback
 let totalNotFollback = 0; // Variabel untuk menyimpan total akun not follback
 
+// Update file name when user selects a file
 document.querySelectorAll('.custom-file-input').forEach(input => {
     input.addEventListener('change', function () {
         const fileName = this.files[0] ? this.files[0].name : 'Choose file';
@@ -9,137 +10,109 @@ document.querySelectorAll('.custom-file-input').forEach(input => {
     });
 });
 
-
+// Function to process and display the output
 function checkNotFollback() {
-    const followersFile = document.getElementById('followersFile').files[0];
-    const followingFile = document.getElementById('followingFile').files[0];
+    const zipFile = document.getElementById('zipFile').files[0];
 
-    // Pengecekan apakah file diupload
-    if (!followersFile || !followingFile) {
-        swal("Error", "Both JSON files must be uploaded.", "error");
-        return;
+    if (zipFile) {
+        handleZipFile(zipFile);
+    } else {
+        swal("Error", "Please upload a ZIP file.", "error");
     }
+}
 
-    const reader1 = new FileReader();
-    const reader2 = new FileReader();
+function handleZipFile(zipFile) {
+    const jszip = new JSZip();
+    jszip.loadAsync(zipFile).then(zip => {
+        const followersPath = "connections/followers_and_following/followers_1.json";
+        const followingPath = "connections/followers_and_following/following.json";
 
-    reader1.onload = function (event) {
-        const jsonFollowers = event.target.result;
+        Promise.all([
+            zip.file(followersPath).async("string"),
+            zip.file(followingPath).async("string")
+        ]).then(([followersContent, followingContent]) => {
+            processJsonData(followersContent, followingContent);
+        }).catch(() => {
+            swal("Error", "Failed to read files from ZIP.", "error");
+        });
+    }).catch(() => {
+        swal("Error", "Invalid ZIP file.", "error");
+    });
+}
 
-        reader2.onload = function (event) {
-            const jsonFollowing = event.target.result;
+function processJsonData(jsonFollowers, jsonFollowing) {
+    try {
+        const followersData = JSON.parse(jsonFollowers);
+        const followingData = JSON.parse(jsonFollowing).relationships_following;
 
-            try {
-                const followersData = JSON.parse(jsonFollowers);
-                const followingData = JSON.parse(jsonFollowing).relationships_following;
+        const followerNames = followersData.map(item => 
+            item.string_list_data.map(account => account.value)
+        ).flat();
 
-                const followerNames = [];
+        notFollbackAccounts = [];
+        followingData.forEach(item => {
+            item.string_list_data.forEach(account => {
+                if (!followerNames.includes(account.value)) {
+                    notFollbackAccounts.push(account);
+                }
+            });
+        });
 
-                // Kumpulkan semua nama dari followers
-                followersData.forEach(item => {
-                    item.string_list_data.forEach(account => {
-                        followerNames.push(account.value);
-                    });
-                });
+        totalNotFollback = notFollbackAccounts.length;
+        document.getElementById('totalNotFollback').innerText = totalNotFollback;
 
-                // Cek setiap following apakah ada di followers, jika tidak tambahkan ke daftar "Not Follback"
-                notFollbackAccounts = []; // Reset array notFollbackAccounts setiap kali fungsi dipanggil
-                followingData.forEach(item => {
-                    item.string_list_data.forEach(account => {
-                        if (!followerNames.includes(account.value)) {
-                            notFollbackAccounts.push(account); // Simpan akun yang tidak mem-follow balik
-                        }
-                    });
-                });
+        // Hide input section and show output section
+        document.getElementById('inputSection').style.display = 'none';
+        document.getElementById('outputSection').style.display = 'block';
 
-                totalNotFollback = notFollbackAccounts.length; // Simpan total not follback
-                displayNotFollbackAccounts(); // Panggil fungsi untuk menampilkan hasil
-
-                // Tampilkan dropdown sorting
-                document.getElementById('sorting').style.display = 'block';
-                document.getElementById('sortingOptions').style.display = 'block';
-                document.getElementById('sortOrderOptions').style.display = 'block';
-
-            } catch (error) {
-                swal("Error", "Invalid JSON data.", "error");
-            }
-        };
-
-        reader2.readAsText(followingFile); // Membaca file following setelah followers selesai dibaca
-    };
-
-    reader1.readAsText(followersFile); // Membaca file followers
+        displayNotFollbackAccounts();
+    } catch {
+        swal("Error", "Invalid JSON data.", "error");
+    }
 }
 
 function displayNotFollbackAccounts() {
-    const sortOption = document.getElementById('sortOption').value;  // Mendapatkan opsi sorting
-    const sortOrder = document.getElementById('sortOrder').value;    // Mendapatkan urutan sorting (asc/desc)
+    const sortOption = document.getElementById('sortOption').value;
+    const sortOrder = document.getElementById('sortOrder').value;
 
-    // Sorting berdasarkan pilihan pengguna
     if (sortOption === 'accountName') {
         notFollbackAccounts.sort((a, b) => a.value.localeCompare(b.value));
     } else if (sortOption === 'date') {
         notFollbackAccounts.sort((a, b) => a.timestamp - b.timestamp);
     }
 
-    // Jika sortOrder adalah 'desc', maka reverse array
     if (sortOrder === 'desc') {
         notFollbackAccounts.reverse();
     }
 
-    // Tampilkan hasil "Not Follback" dalam tabel
-    let output = `<div class="d-flex justify-content-between align-items-center mb-3">`;
-    output += `<h2>Not Follback List: ${totalNotFollback}</h2>`;
-    if (totalNotFollback > 0) {
-        output += `<button id="copyButton" class="btn btn-secondary" onclick="copyNotFollbackAccounts()">Copy</button>`;
-    }
-    output += `</div>`;
-
-    if (totalNotFollback > 0) {
-        // Membuat tabel dengan header
-        output += `<div class="table-responsive"> <table class="table table-bordered table-hover rounded-lg table-sm">
-                        <thead class="bg-primary text-white">
-                            <tr>
-                                <th scope="col">No</th>
-                                <th scope="col">Account Name</th>
-                                <th scope="col">Profile Link</th>
-                                <th scope="col">Date Following</th> <!-- Hanya tampil di desktop -->
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${notFollbackAccounts
-                                .map((account, index) => {
-                                    const date = new Date(account.timestamp * 1000).toLocaleString(); // Konversi timestamp
-                                    return `<tr>
-                                        <td>${index + 1}</td>
-                                        <td>${account.value}</td>
-                                        <td><a href="${account.href}" target="_blank">${account.value}</a></td>
-                                        <td>${date}</td> <!-- Hanya tampil di desktop -->
-                                    </tr>`;
-                                })
-                                .join("")}
-                        </tbody>
-                    </table></div>`;
-        //End of table
-    } else {
-        output += `<p>Everyone you are following follows you back.</p>`;
-        document.getElementById('copyButton').style.display = 'none'; // Sembunyikan tombol copy
-    }
-
+    let output = `<div class="table-responsive"><table class="table table-striped table-hover table-sm table-bordered"><thead><tr><th>No</th><th>Account Name</th><th>Profile Link</th><th>Date Following</th></tr></thead><tbody>`;
+    notFollbackAccounts.forEach((account, index) => {
+        const date = new Date(account.timestamp * 1000);
+        output += `<tr>
+            <td>${index + 1}</td>
+            <td>${account.value}</td>
+            <td><a href="${account.href}" target="_blank">${account.value}</a></td>
+            <td>${date.toLocaleString()}</td>
+        </tr>`;
+    });
+    output += `</tbody></table></div>`;
     document.getElementById('notFollbackOutput').innerHTML = output;
 }
 
-
-
 function copyNotFollbackAccounts() {
-    const accountNames = notFollbackAccounts.map(account => account.value).join('\n'); // Ambil semua nama akun
+    const accountNames = notFollbackAccounts.map(account => account.value).join('\n');
     navigator.clipboard.writeText(accountNames).then(() => {
-        swal("Copied!", "Account names have been copied to clipboard.", "success"); // Notifikasi sukses
-    }).catch(err => {
-        swal("Error", "Failed to copy account names.", "error"); // Notifikasi gagal
+        swal("Copied!", "Account names have been copied to clipboard.", "success");
+    }).catch(() => {
+        swal("Error", "Failed to copy account names.", "error");
     });
 }
 
-// Event listeners untuk sort option dan sort order
-document.getElementById('sortOption').addEventListener('change', displayNotFollbackAccounts);
-document.getElementById('sortOrder').addEventListener('change', displayNotFollbackAccounts);
+function resetForm() {
+    document.getElementById('zipFile').value = '';
+    document.querySelector('.custom-file-label').innerText = 'Choose file';
+    document.getElementById('inputSection').style.display = 'block';
+    document.getElementById('outputSection').style.display = 'none';
+    notFollbackAccounts = [];
+    document.getElementById('notFollbackOutput').innerHTML = '';
+}
