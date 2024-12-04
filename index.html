@@ -26,7 +26,8 @@
             </div>
 
             <div class="d-flex justify-content-center mt-4">
-                <button class="btn btn-primary" onclick="checkNotFollback()">Submit</button>
+                <button class="btn btn-primary mr-2" onclick="processZipUpload()">Check</button>
+                <button class="btn btn-secondary" onclick="showJsonUploadForm()">Switch to JSON file upload</button>
             </div>
         </div>
 
@@ -47,14 +48,14 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <label class="font-weight-bold" for="sortOption">Sort by:</label>
-                                <select id="sortOption" class="form-control" onchange="displayNotFollbackAccounts()">
+                                <select id="sortOption" class="form-control" onchange="renderNotFollbackTable()">
                                     <option value="accountName">Account Name</option>
                                     <option value="date">Date</option>
                                 </select>
                             </div>
                             <div class="col-md-6">
                                 <label class="font-weight-bold" for="sortOrder">Sort order:</label>
-                                <select id="sortOrder" class="form-control" onchange="displayNotFollbackAccounts()">
+                                <select id="sortOrder" class="form-control" onchange="renderNotFollbackTable()">
                                     <option value="asc">Ascending</option>
                                     <option value="desc">Descending</option>
                                 </select>
