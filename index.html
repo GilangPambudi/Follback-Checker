@@ -33,27 +33,18 @@
 
         <!-- Output Section -->
         <div id="outputSection" style="display: none;">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2>Not Follback List: <span id="totalNotFollback">0</span></h2>
-                <div>
-                    <button id="copyButton" class="btn btn-secondary mr-2"
-                        onclick="copyNotFollbackAccounts()">Copy</button>
-                    <button id="newButton" class="btn btn-success" onclick="resetForm()">New</button>
-                </div>
-            </div>
-
-            <div class="card mb-4 bg-light">
+            <div class="card mb-2 bg-light">
                 <div class="card-body">
                     <div class="form-group">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-6 col-sm-10 mb-2">
                                 <label class="font-weight-bold" for="sortOption">Sort by:</label>
                                 <select id="sortOption" class="form-control" onchange="renderNotFollbackTable()">
                                     <option value="accountName">Account Name</option>
                                     <option value="date">Date</option>
                                 </select>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6 col-sm-10 mb-2">
                                 <label class="font-weight-bold" for="sortOrder">Sort order:</label>
                                 <select id="sortOrder" class="form-control" onchange="renderNotFollbackTable()">
                                     <option value="asc">Ascending</option>
@@ -64,7 +55,18 @@
                     </div>
                 </div>
             </div>
-            <div id="notFollbackOutput" class="mt-4"></div>
+            <div class="container">
+                <div class="row mt-4">
+                    <div class="col-12 col-md-6">
+                        <h2>Not Follback List: <span id="totalNotFollback">0</span></h2>
+                    </div>
+                    <div class="col-12 col-md-6 text-md-right text-center">
+                        <button id="copyButton" class="btn btn-secondary" onclick="copyNotFollbackAccounts()">Copy</button>
+                        <button id="newButton" class="btn btn-success" onclick="resetForm()">New</button>
+                    </div>
+                </div>
+            </div>
+            <div id="notFollbackOutput"></div>
         </div>
     </div>
 
